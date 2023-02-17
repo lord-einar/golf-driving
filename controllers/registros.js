@@ -1,14 +1,7 @@
+const { ajustarHora, sumarMinutos } = require("../helpers/funciones");
 const Registro = require("../models/Registro");
 const Transaccion = require("../models/TipoTransaccion");
 const moment = require("moment");
-
-const sumarMinutos = (minutos) => {
-  const fecha = moment.utc().tz('America/Argentina/Buenos_Aires', true).format("YYYY-MM-DD HH:mm:ss");
-  console.log(fecha)  
-  // const fechaSumada = moment(fecha).add(minutos, "minutes");
-  // return fechaSumada.format("YYYY-MM-DD HH:mm:ss");
-}
-
 
 const registrosGET = async (req, res) => {
   const registros = await Registro.findAll({
@@ -28,13 +21,21 @@ const registrosByIdGET = async (req, res) => {
 
 const registrosPOST = async (req, res) => {
   const { gatera_id, pelotas, minutos } = req.body;
-  hora_inicio = moment().format("YYYY-MM-DD HH:mm:ss");
-  hora_fin = sumarMinutos(minutos);
+  hora_inicio = moment().utc().local().format("YYYY-MM-DD HH:mm:ss.SSS");
+  hora_fin = sumarMinutos(hora_inicio, minutos);
 
-  // await Registro.sync({ force: false });
-  // const registroDB = await Registro.create({ gatera_id, pelotas, hora_inicio, hora_fin });
+  await Registro.sync({ force: false });
+  const registroDB = await Registro.create({
+    gatera_id,
+    pelotas,
+    hora_inicio,
+    hora_fin,
+  });
 
-  // res.json(registroDB);
+  registroDB.hora_inicio = ajustarHora(registroDB.hora_inicio);
+  registroDB.hora_fin = ajustarHora(registroDB.hora_fin);
+
+  res.json(registroDB);
 };
 
 module.exports = {
