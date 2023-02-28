@@ -29,8 +29,8 @@ Transaccion.init(
             type: DataTypes.UUID,
             allowNull: false,
         },
-        valor: {
-            type: DataTypes.JSON,
+        operacion: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
     },

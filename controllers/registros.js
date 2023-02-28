@@ -1,7 +1,6 @@
-const { ajustarHora, sumarMinutos } = require("../helpers/funciones");
+const { altaRegistro, activarGatera, addTransaccion } = require("../helpers/funciones");
 const Registro = require("../models/Registro");
 const Transaccion = require("../models/TipoTransaccion");
-const moment = require("moment");
 
 const registrosGET = async (req, res) => {
   const registros = await Registro.findAll({
@@ -20,20 +19,27 @@ const registrosByIdGET = async (req, res) => {
 };
 
 const registrosPOST = async (req, res) => {
-  const { gatera_id, pelotas, minutos } = req.body;
-  hora_inicio = moment().utc().local().format("YYYY-MM-DD HH:mm:ss.SSS");
-  hora_fin = sumarMinutos(hora_inicio, minutos);
+  const { gatera_id, tipo_transaccion_id, operacion, pelotas, minutos } = req.body;
 
-  await Registro.sync({ force: false });
-  const registroDB = await Registro.create({
-    gatera_id,
-    pelotas,
-    hora_inicio,
-    hora_fin,
-  });
+  let registroDB;
+  await altaRegistro(gatera_id, pelotas, minutos)
+    .then((response) => {
+      registroDB = response;
+      activarGatera(gatera_id);
+    }).then(() => {
+      addTransaccion(registroDB.id, tipo_transaccion_id, operacion)
+    })
+    .then(() => {
+      registroDB = {
+        registroDB,
+        msg: "Gatera activada",
+      };
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-  registroDB.hora_inicio = ajustarHora(registroDB.hora_inicio);
-  registroDB.hora_fin = ajustarHora(registroDB.hora_fin);
+
 
   res.json(registroDB);
 };
