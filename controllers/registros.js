@@ -21,11 +21,12 @@ const registrosByIdGET = async (req, res) => {
 const registrosPOST = async (req, res) => {
   const { gatera_id, tipo_transaccion_id, operacion, pelotas, minutos } = req.body;
 
+  await Registro.sync({ force: false });
   let registroDB;
   await altaRegistro(gatera_id, pelotas, minutos)
     .then((response) => {
       registroDB = response;
-      activarGatera(gatera_id);
+      activarGatera(gatera_id, registroDB.id);
     }).then(() => {
       addTransaccion(registroDB.id, tipo_transaccion_id, operacion)
     })
@@ -38,7 +39,6 @@ const registrosPOST = async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
-
 
 
   res.json(registroDB);

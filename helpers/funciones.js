@@ -29,11 +29,11 @@ const altaRegistro = async (gatera_id, pelotas, minutos) => {
   return registroDB;
 };
 
-const activarGatera = async (gatera_id) => {
+const activarGatera = async (gatera_id, registro_id) => {
   await Gatera.sync({ force: false });
 
   const gateraON = await Gatera.update(
-    { active: true },
+    { active: true, registro_id },
     { where: { id: gatera_id } }
   );
 

@@ -1,10 +1,18 @@
 const Gateras = require("../models/Gatera");
+const Registro = require("../models/Registro");
 
 
 
 const gaterasGET = async (req, res) => {
 
-  const gateras = await Gateras.findAll({ where :{active: 1}});
+  const gateras = await Gateras.findAll({order: [['nombre', 'ASC']]});
+
+  res.json(gateras);
+};
+
+const gaterasActivasGET = async (req, res) => {
+
+  const gateras = await Gateras.findAll({ where :{active: 1}, include: Registro});
 
   res.json(gateras);
 };
@@ -22,5 +30,6 @@ const gaterasPOST = async (req, res) => {
 
 module.exports = {
   gaterasGET,
-  gaterasPOST
+  gaterasPOST,
+  gaterasActivasGET
 };

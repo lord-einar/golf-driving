@@ -1,4 +1,4 @@
-const {Sequelize, DataTypes, Model } = require("sequelize");
+const { Sequelize, DataTypes, Model } = require("sequelize");
 
 const sequelize = new Sequelize(
   process.env.DATABASE,
@@ -20,13 +20,17 @@ Gatera.init(
       primaryKey: true,
     },
     nombre: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    registro_id: {
+      type: DataTypes.UUID,
+      defaultValue: null,
     },
   },
   {
